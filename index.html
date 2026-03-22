@@ -3,88 +3,924 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The Feed Network</title>
-  <meta name="description" content="The Feed Network — live streaming news, true crime, FOIA releases, and police scanner coverage." />
+  <title>THE FEED NETWORK — One Network. Three Channels. Always On.</title>
+  <meta name="description" content="THE FEED NETWORK is the umbrella brand above RAWFEED, PAWFEED, and 911FEED. Three distinct live channels serving three distinct audiences, 24/7." />
+  <meta property="og:title" content="THE FEED NETWORK" />
+  <meta property="og:description" content="One network. Three channels. Always on." />
+  <meta property="og:type" content="website" />
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/favicon.png" />
 
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <!-- Inter font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    /* ── Tokens ── */
+    :root {
+      --black:   #0A0A0A;
+      --charcoal:#141414;
+      --gold:    #C9A84C;
+      --gold-dim:#9A7A35;
+      --white:   #FFFFFF;
+      --grey:    #888888;
+      --grey-lt: #BBBBBB;
+      --border:  #222222;
+    }
+
+    /* ── Base ── */
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #0d1117;
-      color: #e6edf3;
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--black);
+      color: var(--white);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    /* ── Utility ── */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+    .gold { color: var(--gold); }
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+
+    /* ═══════════════════════════════════════
+       NAV
+    ═══════════════════════════════════════ */
+    #nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(10,10,10,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      transition: border-color 0.3s;
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+    .nav-logo {
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--grey-lt);
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--gold); }
+    .nav-cta {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.55rem 1.2rem;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      border-radius: 3px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .nav-cta:hover { background: var(--gold); color: var(--black); }
+    .nav-hamburger { display: none; }
+
+    /* ═══════════════════════════════════════
+       HERO
+    ═══════════════════════════════════════ */
+    #hero {
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 2rem;
+      padding: 7rem 2rem 5rem;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201,168,76,0.10) 0%, transparent 70%),
+        var(--black);
+      position: relative;
+      overflow: hidden;
     }
-
-    .logo {
-      width: 96px;
-      height: 96px;
+    .hero-eyebrow {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gold);
       margin-bottom: 1.5rem;
     }
-
-    h1 {
-      font-size: clamp(1.8rem, 5vw, 3rem);
-      font-weight: 700;
+    .hero-title {
+      font-size: clamp(3rem, 9vw, 8rem);
+      font-weight: 900;
       letter-spacing: -0.02em;
+      line-height: 0.95;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+    .hero-title span { color: var(--gold); }
+    .hero-sub {
+      font-size: clamp(1rem, 2.5vw, 1.3rem);
+      font-weight: 300;
+      color: var(--grey-lt);
+      letter-spacing: 0.04em;
+      margin-bottom: 4rem;
+    }
+
+    /* Channel cards */
+    .channel-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5px;
+      width: 100%;
+      max-width: 900px;
+      margin-bottom: 3.5rem;
+      border: 1.5px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .channel-card {
+      background: var(--charcoal);
+      padding: 2rem 1.5rem;
+      text-align: left;
+      transition: background 0.25s;
+      position: relative;
+    }
+    .channel-card:hover { background: #1c1c1c; }
+    .channel-card + .channel-card { border-left: 1.5px solid var(--border); }
+    .channel-card-tag {
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
       margin-bottom: 0.75rem;
     }
-
-    p {
-      font-size: 1.1rem;
-      color: #8b949e;
-      max-width: 480px;
-      line-height: 1.6;
+    .channel-card-name {
+      font-size: 1.3rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
     }
+    .channel-card-desc {
+      font-size: 0.82rem;
+      color: var(--grey);
+      line-height: 1.5;
+    }
+    .channel-card-arrow {
+      position: absolute;
+      top: 1.25rem; right: 1.25rem;
+      font-size: 0.9rem;
+      color: var(--gold);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .channel-card:hover .channel-card-arrow { opacity: 1; }
 
-    .channels {
+    /* CTA row */
+    .hero-ctas {
       display: flex;
       gap: 1rem;
-      margin-top: 2.5rem;
       flex-wrap: wrap;
       justify-content: center;
     }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.9rem 2rem;
+      background: var(--gold);
+      color: var(--black);
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border-radius: 3px;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn-primary:hover { background: #d9b85c; transform: translateY(-1px); }
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.9rem 2rem;
+      border: 1px solid var(--grey);
+      color: var(--grey-lt);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border-radius: 3px;
+      transition: border-color 0.2s, color 0.2s, transform 0.1s;
+    }
+    .btn-secondary:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-1px); }
 
-    .channel-link {
-      display: inline-block;
-      padding: 0.6rem 1.4rem;
-      border: 1px solid #30363d;
-      border-radius: 6px;
-      color: #e6edf3;
-      text-decoration: none;
-      font-size: 0.95rem;
-      font-weight: 500;
-      transition: border-color 0.2s, background 0.2s;
+    /* Scroll indicator */
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      opacity: 0.4;
+    }
+    .scroll-indicator span {
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+    .scroll-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+    @keyframes scrollPulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+
+    /* ═══════════════════════════════════════
+       ABOUT / STATS
+    ═══════════════════════════════════════ */
+    #about {
+      background: var(--charcoal);
+      border-top: 2px solid var(--gold);
+      padding: 6rem 0;
+    }
+    .about-headline {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      margin-bottom: 3.5rem;
+      max-width: 700px;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 5rem;
+    }
+    .stat-block {
+      padding: 2rem 1.75rem;
+      background: var(--black);
+      text-align: center;
+    }
+    .stat-block + .stat-block { border-left: 1px solid var(--border); }
+    .stat-icon { font-size: 1.5rem; margin-bottom: 0.75rem; }
+    .stat-number {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--gold);
+      letter-spacing: -0.02em;
+      margin-bottom: 0.4rem;
+    }
+    .stat-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--grey);
+    }
+    .about-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: start;
+    }
+    .about-story p {
+      font-size: 1rem;
+      color: var(--grey-lt);
+      line-height: 1.8;
+      margin-bottom: 1.25rem;
+    }
+    .about-story p:last-child { margin-bottom: 0; }
+    .about-values {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .value-item {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      padding: 1.25rem;
+      background: var(--charcoal);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
+    .value-icon {
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+    .value-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.3rem;
+    }
+    .value-desc {
+      font-size: 0.82rem;
+      color: var(--grey);
+      line-height: 1.5;
     }
 
-    .channel-link:hover {
-      border-color: #58a6ff;
-      background: #161b22;
+    /* ═══════════════════════════════════════
+       NETWORKS
+    ═══════════════════════════════════════ */
+    #networks {
+      background: var(--black);
+      padding: 6rem 0;
+    }
+    .networks-headline {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      margin-bottom: 1rem;
+    }
+    .networks-sub {
+      font-size: 1rem;
+      color: var(--grey);
+      max-width: 600px;
+      margin-bottom: 4rem;
+    }
+    .networks-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5px;
+      background: var(--border);
+      border: 1.5px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 4rem;
+    }
+    .network-card {
+      background: var(--charcoal);
+      padding: 2.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .network-card:hover { background: #181818; }
+    .network-num {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      color: var(--gold-dim);
+      margin-bottom: 1.5rem;
+    }
+    .network-name {
+      font-size: 2rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    .network-tagline {
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.25rem;
+    }
+    .network-desc {
+      font-size: 0.88rem;
+      color: var(--grey);
+      line-height: 1.7;
+      flex: 1;
+      margin-bottom: 2rem;
+    }
+    .network-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s;
+      width: fit-content;
+    }
+    .network-link:hover { border-color: var(--gold); }
+    .hub-card {
+      background: var(--black);
+      border: 1.5px solid var(--border);
+      border-radius: 4px;
+      padding: 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 3rem;
+    }
+    .hub-card-left h3 {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.75rem;
+    }
+    .hub-card-left p {
+      font-size: 1.4rem;
+      font-weight: 700;
+      max-width: 500px;
+      line-height: 1.4;
+    }
+    .hub-card-right { flex-shrink: 0; }
+
+    /* ═══════════════════════════════════════
+       PRESS
+    ═══════════════════════════════════════ */
+    #press {
+      background: var(--charcoal);
+      border-top: 1px solid var(--border);
+      padding: 6rem 0;
+    }
+    .press-headline {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      margin-bottom: 1rem;
+    }
+    .press-sub {
+      font-size: 1rem;
+      color: var(--grey);
+      max-width: 600px;
+      margin-bottom: 4rem;
+    }
+    .press-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 3.5rem;
+    }
+    .press-item {
+      background: var(--black);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2rem;
+    }
+    .press-item-icon { font-size: 1.5rem; margin-bottom: 1rem; }
+    .press-item-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    .press-item-desc { font-size: 0.82rem; color: var(--grey); line-height: 1.6; }
+    .press-contact {
+      background: var(--black);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+    .press-contact p { font-size: 0.9rem; color: var(--grey-lt); max-width: 500px; }
+    .press-contact p strong { color: var(--white); }
+
+    /* ═══════════════════════════════════════
+       LINKS
+    ═══════════════════════════════════════ */
+    #links {
+      background: var(--black);
+      border-top: 1px solid var(--border);
+      padding: 6rem 0;
+    }
+    .links-headline {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      margin-bottom: 4rem;
+    }
+    .links-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5px;
+      background: var(--border);
+      border: 1.5px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .links-category {
+      background: var(--charcoal);
+      padding: 2.5rem;
+    }
+    .links-cat-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+    }
+    .link-list { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+    .link-list a {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      background: var(--black);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--grey-lt);
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .link-list a:hover { border-color: var(--gold); color: var(--white); }
+    .link-list a span:last-child { color: var(--gold); font-size: 0.75rem; }
+
+    /* ═══════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════ */
+    #footer {
+      background: var(--charcoal);
+      border-top: 1px solid var(--border);
+      padding: 3rem 0;
+    }
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .footer-logo {
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .footer-copy {
+      font-size: 0.75rem;
+      color: var(--grey);
+    }
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+    .footer-links a {
+      font-size: 0.72rem;
+      color: var(--grey);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--gold); }
+
+    /* ═══════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════ */
+    @media (max-width: 900px) {
+      .nav-links, .nav-cta { display: none; }
+      .nav-hamburger {
+        display: block;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--white);
+        font-size: 1.25rem;
+        padding: 0.25rem;
+      }
+      .channel-cards { grid-template-columns: 1fr; }
+      .channel-card + .channel-card { border-left: none; border-top: 1.5px solid var(--border); }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .stat-block + .stat-block { border-left: none; }
+      .stat-block:nth-child(odd) { border-right: 1px solid var(--border); }
+      .stat-block:nth-child(3), .stat-block:nth-child(4) { border-top: 1px solid var(--border); }
+      .about-columns { grid-template-columns: 1fr; gap: 3rem; }
+      .networks-grid { grid-template-columns: 1fr; }
+      .press-grid { grid-template-columns: 1fr; }
+      .links-grid { grid-template-columns: 1fr; }
+      .hub-card { flex-direction: column; text-align: center; }
+      .hub-card-left p { font-size: 1.1rem; }
+      .press-contact { flex-direction: column; }
+      .footer-inner { flex-direction: column; text-align: center; }
+    }
+    @media (max-width: 600px) {
+      .hero-ctas { flex-direction: column; align-items: stretch; }
+      .btn-primary, .btn-secondary { justify-content: center; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
     }
   </style>
 </head>
 <body>
-  <img src="/favicon.png" alt="The Feed Network" class="logo" />
-  <h1>The Feed Network</h1>
-  <p>Live streaming news, true crime, FOIA releases, and police scanner coverage — 24/7.</p>
 
-  <div class="channels">
-    <a class="channel-link" href="https://www.youtube.com/@THE_FEED_NETWORK" target="_blank" rel="noopener">
-      THE FEED NETWORK ↗
-    </a>
-    <a class="channel-link" href="https://www.youtube.com/@911feed" target="_blank" rel="noopener">
-      911FEED ↗
-    </a>
-  </div>
+  <!-- ═══ NAV ═══ -->
+  <nav id="nav">
+    <div class="container nav-inner">
+      <a href="#hero" class="nav-logo">The Feed Network</a>
+      <ul class="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#networks">Watch</a></li>
+        <li><a href="#networks">Networks</a></li>
+        <li><a href="#press">Press</a></li>
+        <li><a href="#links">Links</a></li>
+      </ul>
+      <a href="https://youtube.com/@THE_FEED_NETWORK" target="_blank" rel="noopener" class="nav-cta">Watch Live ↗</a>
+      <button class="nav-hamburger" aria-label="Menu">☰</button>
+    </div>
+  </nav>
+
+  <!-- ═══ HERO ═══ -->
+  <section id="hero">
+    <p class="hero-eyebrow">Established 2024 &nbsp;·&nbsp; YouTube &nbsp;·&nbsp; Live 24/7</p>
+    <h1 class="hero-title">The<br /><span>Feed</span><br />Network</h1>
+    <p class="hero-sub">One network. Three channels. Always on.</p>
+
+    <div class="channel-cards">
+      <a class="channel-card" href="https://youtube.com/@rawfeed" target="_blank" rel="noopener">
+        <span class="channel-card-arrow">↗</span>
+        <p class="channel-card-tag">Channel 01</p>
+        <p class="channel-card-name">RAWFEED</p>
+        <p class="channel-card-desc">Nature, wildlife, world cameras — 24/7 unfiltered live footage from across the globe.</p>
+      </a>
+      <a class="channel-card" href="https://youtube.com/@pawfeed" target="_blank" rel="noopener">
+        <span class="channel-card-arrow">↗</span>
+        <p class="channel-card-tag">Channel 02</p>
+        <p class="channel-card-name">PAWFEED</p>
+        <p class="channel-card-desc">Cats, dogs, rescue, adoption — live from shelters and foster homes around the clock.</p>
+      </a>
+      <a class="channel-card" href="https://youtube.com/@911feed" target="_blank" rel="noopener">
+        <span class="channel-card-arrow">↗</span>
+        <p class="channel-card-tag">Channel 03</p>
+        <p class="channel-card-name">911FEED</p>
+        <p class="channel-card-desc">Police footage, 911 calls, court evidence, FOIA releases — the record as it stands.</p>
+      </a>
+    </div>
+
+    <div class="hero-ctas">
+      <a class="btn-primary" href="https://youtube.com/@THE_FEED_NETWORK" target="_blank" rel="noopener">
+        Watch THE FEED NETWORK →
+      </a>
+      <a class="btn-secondary" href="https://youtube.com/@911feed" target="_blank" rel="noopener">
+        911FEED →
+      </a>
+    </div>
+
+    <div class="scroll-indicator">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ═══ ABOUT / STATS ═══ -->
+  <section id="about">
+    <div class="container">
+      <p class="section-label">About the Network</p>
+      <h2 class="about-headline">One creator. Three channels. Real footage.</h2>
+
+      <div class="stats-grid">
+        <div class="stat-block">
+          <div class="stat-icon">📺</div>
+          <div class="stat-number">3</div>
+          <div class="stat-label">Channels Live</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-icon">🐾</div>
+          <div class="stat-number" id="stat-adoptions">0</div>
+          <div class="stat-label">Adoptions Facilitated</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-icon">📋</div>
+          <div class="stat-number" id="stat-foia">0</div>
+          <div class="stat-label">FOIA Requests Filed</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-icon">⏱️</div>
+          <div class="stat-number" id="stat-hours">0</div>
+          <div class="stat-label">Hours of Live Footage</div>
+        </div>
+      </div>
+
+      <div class="about-columns">
+        <div class="about-story">
+          <p>THE FEED NETWORK is the umbrella brand above RAWFEED, PAWFEED, and 911FEED. Three distinct live channels serving three distinct audiences, united by a single creator, a single infrastructure, and an uncompromising commitment to real, unfiltered live footage — 24 hours a day, 7 days a week.</p>
+          <p>We don't editorialize. We don't sensationalize. We point a camera at the world and let it speak for itself — whether that's a police scanner in real time, a litter of rescue kittens, or a wilderness stream at 3am.</p>
+          <p>Each channel operates independently with its own audience and identity, but shares a common backbone: always-on infrastructure, consistent quality, and a belief that transparency is the highest form of journalism.</p>
+        </div>
+        <div class="about-values">
+          <div class="value-item">
+            <div class="value-icon">🎯</div>
+            <div>
+              <div class="value-title">Always On</div>
+              <div class="value-desc">Live 24/7 across all three channels. No off-switch. No editorial delays. What happens, broadcasts.</div>
+            </div>
+          </div>
+          <div class="value-item">
+            <div class="value-icon">🔍</div>
+            <div>
+              <div class="value-title">Radical Transparency</div>
+              <div class="value-desc">FOIA requests, police footage, court evidence — primary sources, unedited, in the public interest.</div>
+            </div>
+          </div>
+          <div class="value-item">
+            <div class="value-icon">🌐</div>
+            <div>
+              <div class="value-title">Network Reach</div>
+              <div class="value-desc">Three audiences, one brand. The Feed Network infrastructure scales each channel independently.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ NETWORKS ═══ -->
+  <section id="networks">
+    <div class="container">
+      <p class="section-label">The Channels</p>
+      <h2 class="networks-headline">Three channels. One standard.</h2>
+      <p class="networks-sub">Each channel serves a distinct audience and content vertical. All share the same commitment to live, unfiltered coverage.</p>
+
+      <div class="networks-grid">
+        <div class="network-card">
+          <div class="network-num">01 / RAWFEED</div>
+          <div class="network-name">RAW<span class="gold">FEED</span></div>
+          <div class="network-tagline">Nature · Wildlife · World Cameras</div>
+          <p class="network-desc">Live cameras pointed at nature: wildlife reserves, rivers, forests, city skylines, and remote landscapes from around the world. No commentary. No cuts. Just the world, as it is, right now.</p>
+          <a class="network-link" href="https://youtube.com/@rawfeed" target="_blank" rel="noopener">
+            Watch on YouTube ↗
+          </a>
+        </div>
+        <div class="network-card">
+          <div class="network-num">02 / PAWFEED</div>
+          <div class="network-name">PAW<span class="gold">FEED</span></div>
+          <div class="network-tagline">Rescue · Adoption · Always Live</div>
+          <p class="network-desc">Live from shelters, foster homes, and rescue organisations. Cats, dogs, and animals in need — streamed around the clock to help them find their forever homes. Every viewer is a potential adopter.</p>
+          <a class="network-link" href="https://youtube.com/@pawfeed" target="_blank" rel="noopener">
+            Watch on YouTube ↗
+          </a>
+        </div>
+        <div class="network-card">
+          <div class="network-num">03 / 911FEED</div>
+          <div class="network-name">911<span class="gold">FEED</span></div>
+          <div class="network-tagline">Police · FOIA · Court Evidence</div>
+          <p class="network-desc">Police bodycam footage, 911 call recordings, court evidence releases, and FOIA documents — presented without commentary, in the public interest. The record as it stands.</p>
+          <a class="network-link" href="https://youtube.com/@911feed" target="_blank" rel="noopener">
+            Watch on YouTube ↗
+          </a>
+        </div>
+      </div>
+
+      <div class="hub-card">
+        <div class="hub-card-left">
+          <h3>THE FEED NETWORK — Hub Channel</h3>
+          <p>The main channel. Network news, highlights, cross-channel coverage, and live events. Subscribe to stay across everything The Feed Network publishes.</p>
+        </div>
+        <div class="hub-card-right">
+          <a class="btn-primary" href="https://youtube.com/@THE_FEED_NETWORK" target="_blank" rel="noopener">
+            Subscribe Now →
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ PRESS ═══ -->
+  <section id="press">
+    <div class="container">
+      <p class="section-label">Press &amp; Media</p>
+      <h2 class="press-headline">Press Kit</h2>
+      <p class="press-sub">Everything journalists and partners need to cover or reference The Feed Network and its channels.</p>
+
+      <div class="press-grid">
+        <div class="press-item">
+          <div class="press-item-icon">📐</div>
+          <div class="press-item-title">Brand Assets</div>
+          <p class="press-item-desc">Logos, colour palettes, and typography guidelines for all four channels. Available in SVG and PNG formats.</p>
+        </div>
+        <div class="press-item">
+          <div class="press-item-icon">📊</div>
+          <div class="press-item-title">Channel Statistics</div>
+          <p class="press-item-desc">Current subscriber counts, average live viewer numbers, audience demographics, and growth trajectory across the network.</p>
+        </div>
+        <div class="press-item">
+          <div class="press-item-icon">📝</div>
+          <div class="press-item-title">Editorial Guidelines</div>
+          <p class="press-item-desc">Our editorial standards, FOIA request process, content policies, and the principles that govern every broadcast decision.</p>
+        </div>
+      </div>
+
+      <div class="press-contact">
+        <p>For press enquiries, interview requests, partnership discussions, or sponsorship opportunities, please get in touch directly. We respond to all media enquiries within 48 hours.</p>
+        <a class="btn-secondary" href="mailto:press@thefeednetwork.com">
+          Contact Press →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ LINKS ═══ -->
+  <section id="links">
+    <div class="container">
+      <p class="section-label">Quick Links</p>
+      <h2 class="links-headline">Find us everywhere.</h2>
+
+      <div class="links-grid">
+        <div class="links-category">
+          <div class="links-cat-label">YouTube Channels</div>
+          <ul class="link-list">
+            <li><a href="https://youtube.com/@THE_FEED_NETWORK" target="_blank" rel="noopener"><span>THE FEED NETWORK</span><span>↗</span></a></li>
+            <li><a href="https://youtube.com/@rawfeed" target="_blank" rel="noopener"><span>RAWFEED</span><span>↗</span></a></li>
+            <li><a href="https://youtube.com/@pawfeed" target="_blank" rel="noopener"><span>PAWFEED</span><span>↗</span></a></li>
+            <li><a href="https://youtube.com/@911feed" target="_blank" rel="noopener"><span>911FEED</span><span>↗</span></a></li>
+          </ul>
+        </div>
+        <div class="links-category">
+          <div class="links-cat-label">Support &amp; Community</div>
+          <ul class="link-list">
+            <li><a href="https://patreon.com/thefeednetwork" target="_blank" rel="noopener"><span>Support on Patreon</span><span>↗</span></a></li>
+            <li><a href="mailto:press@thefeednetwork.com"><span>Press Enquiries</span><span>→</span></a></li>
+            <li><a href="mailto:sponsors@thefeednetwork.com"><span>Sponsorship</span><span>→</span></a></li>
+            <li><a href="#press"><span>Press Kit</span><span>↓</span></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer id="footer">
+    <div class="container footer-inner">
+      <div class="footer-logo">The Feed Network</div>
+      <p class="footer-copy">© 2024 The Feed Network. All rights reserved.</p>
+      <ul class="footer-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#networks">Channels</a></li>
+        <li><a href="#press">Press</a></li>
+        <li><a href="mailto:press@thefeednetwork.com">Contact</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    // Sticky nav shadow on scroll
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.style.borderBottomColor = window.scrollY > 10 ? '#333' : '#222';
+    }, { passive: true });
+
+    // Mobile menu placeholder
+    document.querySelector('.nav-hamburger').addEventListener('click', () => {
+      // Simple toggle — can be expanded into a full mobile menu
+      const links = document.querySelector('.nav-links');
+      if (links) {
+        links.style.display = links.style.display === 'flex' ? 'none' : 'flex';
+        links.style.flexDirection = 'column';
+        links.style.position = 'absolute';
+        links.style.top = '64px';
+        links.style.left = '0';
+        links.style.right = '0';
+        links.style.background = '#0A0A0A';
+        links.style.padding = '1.5rem 2rem';
+        links.style.borderBottom = '1px solid #222';
+        links.style.gap = '1.25rem';
+      }
+    });
+  </script>
 </body>
 </html>
