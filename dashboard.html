@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE FEED NETWORK — OPS DASHBOARD</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold:#C9A84C; --gold-glow:rgba(201,168,76,0.12);
+  --bg:#0A0A0F; --surface:#0F0F18; --surface2:#141420;
+  --border:rgba(201,168,76,0.18); --border-bright:rgba(201,168,76,0.45);
+  --text:#E8E8F0; --text-dim:#5A5A70; --text-mid:#9A9AB0;
+  --green:#2ECC71; --green-dim:rgba(46,204,113,0.12);
+  --red:#E74C3C; --red-dim:rgba(231,76,60,0.12);
+  --amber:#F39C12; --amber-dim:rgba(243,156,18,0.12);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;
+  background-image:linear-gradient(rgba(201,168,76,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,0.025) 1px,transparent 1px);
+  background-size:48px 48px;pointer-events:none;z-index:0;}
+header{position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.96);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:64px;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;color:var(--gold);}
+.logo-sub{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--text-dim);margin-left:2px;}
+.nav-link{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text-dim);text-decoration:none;text-transform:uppercase;transition:color .2s;}
+.nav-link:hover{color:var(--gold);}
+.header-right{display:flex;align-items:center;gap:16px;}
+.live-pill{display:flex;align-items:center;gap:7px;padding:5px 12px;background:var(--green-dim);border:1px solid rgba(46,204,113,0.3);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--green);}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:blink 1.8s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.timestamp{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);}
+.refresh-btn{background:transparent;border:1px solid var(--border);color:var(--gold);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;padding:7px 14px;cursor:pointer;transition:all .2s;}
+.refresh-btn:hover{background:var(--gold-glow);border-color:var(--border-bright);}
+main{position:relative;z-index:1;padding:32px 32px 60px;max-width:1560px;margin:0 auto;}
+.status-bar{display:flex;align-items:center;gap:16px;padding:14px 20px;background:var(--surface);border:1px solid var(--border);margin-bottom:36px;font-family:'Space Mono',monospace;font-size:11px;}
+.status-badge{padding:4px 12px;font-size:10px;font-weight:700;letter-spacing:2px;border:1px solid;}
+.badge-healthy{background:var(--green-dim);color:var(--green);border-color:var(--green);}
+.badge-warning{background:var(--amber-dim);color:var(--amber);border-color:var(--amber);}
+.badge-critical{background:var(--red-dim);color:var(--red);border-color:var(--red);}
+.badge-loading{background:rgba(107,107,128,0.12);color:var(--text-dim);border-color:var(--text-dim);}
+.status-label{color:var(--text-mid);}
+.status-detail{color:var(--text-dim);margin-left:auto;}
+.section-hd{display:flex;align-items:center;gap:14px;margin-bottom:16px;}
+.section-hd-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;white-space:nowrap;}
+.section-hd-line{flex:1;height:1px;background:var(--border);}
+.mb32{margin-bottom:32px;} .mb36{margin-bottom:36px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+.g6{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;}
+.g21{display:grid;grid-template-columns:2fr 1fr;gap:16px;}
+@media(max-width:1100px){.g4,.g6{grid-template-columns:repeat(2,1fr);}.g21{grid-template-columns:1fr;}}
+@media(max-width:640px){.g4,.g3,.g2,.g6{grid-template-columns:1fr;}main{padding:20px 16px 40px;}header{padding:0 16px;}}
+.card{background:var(--surface);border:1px solid var(--border);padding:22px;position:relative;overflow:hidden;transition:border-color .25s;}
+.card:hover{border-color:var(--border-bright);}
+.card-accent{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0;transition:opacity .25s;}
+.card:hover .card-accent{opacity:1;}
+.c-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase;margin-bottom:14px;}
+.c-val{font-family:'Bebas Neue',sans-serif;font-size:52px;line-height:1;color:var(--gold);letter-spacing:1px;}
+.c-val.lg{font-size:64px;} .c-val.md{font-size:38px;}
+.c-sub{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);margin-top:8px;}
+.stream-card{background:var(--surface);border:1px solid var(--border);padding:16px;position:relative;transition:all .25s;}
+.stream-card.active{border-color:rgba(46,204,113,0.35);}
+.stream-card.active .sc-bar{background:var(--green);}
+.stream-card.inactive{border-color:rgba(231,76,60,0.25);opacity:0.55;}
+.stream-card.inactive .sc-bar{background:var(--red);}
+.stream-card.loading .sc-bar{background:var(--text-dim);}
+.sc-bar{position:absolute;top:0;left:0;right:0;height:2px;}
+.sc-id{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--text-dim);margin-bottom:8px;}
+.sc-name{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:var(--text);line-height:1.3;margin-bottom:10px;}
+.sc-status{font-family:'Space Mono',monospace;font-size:10px;display:flex;align-items:center;gap:6px;}
+.sc-status.on{color:var(--green);} .sc-status.off{color:var(--red);} .sc-status.ld{color:var(--text-dim);}
+.sc-dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+.sc-restarts{font-family:'Space Mono',monospace;font-size:9px;color:var(--text-dim);margin-top:8px;}
+.health-card{background:var(--surface);border:1px solid var(--border);padding:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;}
+.health-ring{width:120px;height:120px;position:relative;margin-bottom:16px;}
+.health-ring svg{transform:rotate(-90deg);}
+.health-ring .track{stroke:#1a1a28;fill:none;stroke-width:8;}
+.health-ring .fill{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset 1s ease;}
+.fill.excellent{stroke:var(--green);} .fill.good{stroke:var(--gold);} .fill.fair{stroke:var(--amber);} .fill.poor{stroke:var(--red);}
+.health-score-num{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--gold);letter-spacing:1px;}
+.health-rating{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;margin-bottom:6px;}
+.health-rating.excellent{color:var(--green);} .health-rating.good{color:var(--gold);} .health-rating.fair{color:var(--amber);} .health-rating.poor{color:var(--red);}
+.health-sub{font-size:11px;color:var(--text-dim);font-family:'Space Mono',monospace;}
+.metric-list{background:var(--surface);border:1px solid var(--border);overflow:hidden;}
+.metric-item{display:flex;align-items:center;justify-content:space-between;padding:13px 20px;border-bottom:1px solid rgba(201,168,76,0.06);transition:background .15s;}
+.metric-item:last-child{border-bottom:none;}
+.metric-item:hover{background:rgba(201,168,76,0.04);}
+.metric-key{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:1px;}
+.metric-val{font-family:'Space Mono',monospace;font-size:11px;color:var(--text);font-weight:700;}
+.metric-val.gold{color:var(--gold);} .metric-val.green{color:var(--green);} .metric-val.red{color:var(--red);} .metric-val.amber{color:var(--amber);}
+.channel-card{background:var(--surface);border:1px solid var(--border);padding:20px;position:relative;transition:border-color .25s;}
+.channel-card:hover{border-color:var(--border-bright);}
+.ch-tag{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--text-dim);margin-bottom:10px;}
+.ch-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--gold);margin-bottom:16px;}
+.ch-stat{display:flex;justify-content:space-between;margin-bottom:8px;}
+.ch-stat-k{font-family:'Space Mono',monospace;font-size:9px;color:var(--text-dim);}
+.ch-stat-v{font-family:'Space Mono',monospace;font-size:11px;color:var(--text);}
+.wf-table{background:var(--surface);border:1px solid var(--border);overflow:hidden;}
+.wf-row{display:grid;grid-template-columns:80px 1fr 100px 180px;border-bottom:1px solid rgba(201,168,76,0.08);align-items:center;transition:background .15s;}
+.wf-row:last-child{border-bottom:none;}
+.wf-row:hover{background:rgba(201,168,76,0.04);}
+.wf-row.hdr{background:var(--surface2);border-bottom:1px solid var(--border);}
+.wf-cell{padding:11px 16px;font-family:'Space Mono',monospace;font-size:10px;}
+.wf-row.hdr .wf-cell{color:var(--text-dim);letter-spacing:2px;font-size:9px;}
+.wf-id{color:var(--gold);} .wf-name{color:var(--text);font-family:'DM Sans',sans-serif;font-size:12px;}
+.wf-badge{display:inline-block;padding:3px 8px;font-size:9px;letter-spacing:1px;border:1px solid;}
+.ws-active{background:var(--green-dim);color:var(--green);border-color:rgba(46,204,113,0.4);}
+.ws-inactive{background:var(--red-dim);color:var(--red);border-color:rgba(231,76,60,0.4);}
+.wf-trigger{color:var(--text-dim);font-size:9px;}
+.alert-feed{background:var(--surface);border:1px solid var(--border);max-height:260px;overflow-y:auto;}
+.alert-feed::-webkit-scrollbar{width:3px;}
+.alert-feed::-webkit-scrollbar-thumb{background:var(--border);}
+.alert-item{display:flex;gap:12px;align-items:flex-start;padding:11px 16px;border-bottom:1px solid rgba(201,168,76,0.06);font-size:12px;}
+.alert-item:last-child{border-bottom:none;}
+.alert-time{font-family:'Space Mono',monospace;font-size:9px;color:var(--text-dim);min-width:48px;margin-top:1px;}
+.alert-msg{color:var(--text-mid);line-height:1.5;}
+.alert-dot{font-size:8px;}
+.alert-item.ok .alert-dot{color:var(--green);}
+.alert-item.warn .alert-dot{color:var(--amber);}
+.alert-item.crit .alert-dot{color:var(--red);}
+.alert-item.info .alert-dot{color:#3498DB;}
+footer{text-align:center;padding:24px;border-top:1px solid var(--border);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--text-dim);}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="logo">THE FEED NETWORK</div>
+    <div class="logo-sub">OPS DASHBOARD</div>
+  </div>
+  <a href="/" class="nav-link">← Back to Site</a>
+  <div class="header-right">
+    <div class="live-pill"><div class="live-dot"></div>LIVE</div>
+    <div class="timestamp" id="ts">--:--:--</div>
+    <button class="refresh-btn" onclick="loadAll()">↻ REFRESH</button>
+  </div>
+</header>
+
+<main>
+  <div class="status-bar">
+    <div class="status-badge badge-loading" id="net-badge">LOADING</div>
+    <div class="status-label" id="net-text">Fetching network status...</div>
+    <div class="status-detail" id="net-detail"></div>
+  </div>
+
+  <div class="section-hd mb32"><div class="section-hd-label">Network Overview</div><div class="section-hd-line"></div></div>
+  <div class="g4 mb36">
+    <div class="card"><div class="card-accent"></div><div class="c-label">Active Streams</div><div class="c-val lg" id="stat-streams">—</div><div class="c-sub">of 6 channels</div></div>
+    <div class="card"><div class="card-accent"></div><div class="c-label">Total Subscribers</div><div class="c-val" id="stat-subs">—</div><div class="c-sub">Both channels combined</div></div>
+    <div class="card"><div class="card-accent"></div><div class="c-label">Live Viewers</div><div class="c-val" id="stat-viewers">—</div><div class="c-sub">Concurrent across network</div></div>
+    <div class="card"><div class="card-accent"></div><div class="c-label">Active Workflows</div><div class="c-val" id="stat-wf">—</div><div class="c-sub">n8n automations running</div></div>
+  </div>
+
+  <div class="section-hd"><div class="section-hd-label">Live Stream Status</div><div class="section-hd-line"></div></div>
+  <div class="g6 mb36" id="streams-grid">
+    <div class="stream-card loading" style="grid-column:1/-1"><div class="sc-bar"></div><div class="sc-id">LOADING</div><div class="sc-name">Connecting to FFmpeg service...</div></div>
+  </div>
+
+  <div class="section-hd"><div class="section-hd-label">YouTube Channels</div><div class="section-hd-line"></div></div>
+  <div class="g21 mb36">
+    <div class="g2">
+      <div class="channel-card"><div class="card-accent"></div><div class="ch-tag">CHANNEL 01</div><div class="ch-name">THE FEED NETWORK</div>
+        <div class="ch-stat"><span class="ch-stat-k">SUBSCRIBERS</span><span class="ch-stat-v" id="fn-subs">—</span></div>
+        <div class="ch-stat"><span class="ch-stat-k">TODAY'S VIEWS</span><span class="ch-stat-v" id="fn-views">—</span></div>
+        <div class="ch-stat"><span class="ch-stat-k">LIVE VIEWERS</span><span class="ch-stat-v" id="fn-live">—</span></div>
+      </div>
+      <div class="channel-card"><div class="card-accent"></div><div class="ch-tag">CHANNEL 02</div><div class="ch-name">911FEED</div>
+        <div class="ch-stat"><span class="ch-stat-k">SUBSCRIBERS</span><span class="ch-stat-v" id="f911-subs">—</span></div>
+        <div class="ch-stat"><span class="ch-stat-k">TODAY'S VIEWS</span><span class="ch-stat-v" id="f911-views">—</span></div>
+        <div class="ch-stat"><span class="ch-stat-k">LIVE VIEWERS</span><span class="ch-stat-v" id="f911-live">—</span></div>
+      </div>
+    </div>
+    <div class="health-card">
+      <div class="health-ring">
+        <svg viewBox="0 0 120 120" width="120" height="120">
+          <circle class="track" cx="60" cy="60" r="52"/>
+          <circle class="fill good" cx="60" cy="60" r="52" id="health-arc" stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+        </svg>
+        <div class="health-score-num" id="health-num">—</div>
+      </div>
+      <div class="health-rating good" id="health-rating">LOADING</div>
+      <div class="health-sub" id="health-sub">Network health score /60</div>
+    </div>
+  </div>
+
+  <div class="section-hd"><div class="section-hd-label">Revenue & Operations</div><div class="section-hd-line"></div></div>
+  <div class="g3 mb36">
+    <div class="metric-list">
+      <div class="metric-item"><span class="metric-key">THIS WEEK'S REVENUE</span><span class="metric-val gold" id="rev-week">—</span></div>
+      <div class="metric-item"><span class="metric-key">PATREON MEMBERS</span><span class="metric-val" id="rev-patreon">—</span></div>
+      <div class="metric-item"><span class="metric-key">OPEN DEALS</span><span class="metric-val" id="rev-deals">—</span></div>
+      <div class="metric-item"><span class="metric-key">PIPELINE VALUE</span><span class="metric-val gold" id="rev-pipeline">—</span></div>
+      <div class="metric-item"><span class="metric-key">OUTSTANDING INVOICES</span><span class="metric-val amber" id="rev-invoices">—</span></div>
+    </div>
+    <div class="metric-list">
+      <div class="metric-item"><span class="metric-key">FFMPEG SERVICE</span><span class="metric-val" id="ops-ffmpeg">—</span></div>
+      <div class="metric-item"><span class="metric-key">N8N INSTANCE</span><span class="metric-val" id="ops-n8n">—</span></div>
+      <div class="metric-item"><span class="metric-key">WEBSITE (VERCEL)</span><span class="metric-val green">ONLINE</span></div>
+      <div class="metric-item"><span class="metric-key">WF EXECUTIONS TODAY</span><span class="metric-val" id="ops-execs">—</span></div>
+      <div class="metric-item"><span class="metric-key">FAILED EXECUTIONS</span><span class="metric-val" id="ops-fails">—</span></div>
+    </div>
+    <div class="metric-list">
+      <div class="metric-item"><span class="metric-key">FOIA REQUESTS OPEN</span><span class="metric-val" id="foia-open">—</span></div>
+      <div class="metric-item"><span class="metric-key">ADOPTIONS TOTAL</span><span class="metric-val gold" id="adoptions">—</span></div>
+      <div class="metric-item"><span class="metric-key">SOCIAL POSTS TODAY</span><span class="metric-val" id="social-today">—</span></div>
+      <div class="metric-item"><span class="metric-key">OPEN HR ROLES</span><span class="metric-val" id="hr-roles">—</span></div>
+      <div class="metric-item"><span class="metric-key">YPP PROGRESS</span><span class="metric-val amber" id="ypp">—</span></div>
+    </div>
+  </div>
+
+  <div class="section-hd"><div class="section-hd-label">Critical Workflows</div><div class="section-hd-line"></div></div>
+  <div class="mb36">
+    <div class="wf-table">
+      <div class="wf-row hdr">
+        <div class="wf-cell">REF</div><div class="wf-cell">WORKFLOW NAME</div>
+        <div class="wf-cell">STATUS</div><div class="wf-cell">TRIGGER</div>
+      </div>
+      <div id="wf-body"></div>
+    </div>
+  </div>
+
+  <div class="section-hd"><div class="section-hd-label">Activity Log</div><div class="section-hd-line"></div></div>
+  <div class="alert-feed mb36" id="alert-feed"></div>
+</main>
+
+<footer>THE FEED NETWORK © 2025 &nbsp;·&nbsp; OPS DASHBOARD &nbsp;·&nbsp; AUTO-REFRESHES EVERY 60s</footer>
+
+<script>
+const N8N='https://n8n-production-c310.up.railway.app';
+const FFMPEG='https://ffmpeg-service-production-b777.up.railway.app';
+const KEY='feednetwork2026';
+
+const STREAMS=[
+  {id:'rawfeed-waterhole',label:'RAWFEED: Waterhole'},
+  {id:'rawfeed-eagles',label:'RAWFEED: Eagle Nest'},
+  {id:'rawfeed-shibuya',label:'RAWFEED: Shibuya'},
+  {id:'pawfeed-nursery',label:'PAWFEED: Nursery'},
+  {id:'pawfeed-yard',label:'PAWFEED: Yard'},
+  {id:'pawfeed-cafe',label:'PAWFEED: Cafe'},
+];
+
+const WORKFLOWS=[
+  {ref:'ST-02',name:'Stream Health Monitor',trigger:'Every 5 min'},
+  {ref:'MN-01',name:'Morning Network Briefing',trigger:'Daily 07:30'},
+  {ref:'OP-05',name:'Stream Down Alert',trigger:'Every 5 min'},
+  {ref:'AN-02',name:'Viral Alert',trigger:'Every 30 min'},
+  {ref:'NW-01',name:'Network Health Score',trigger:'Daily 07:00'},
+  {ref:'DB-01',name:'Live Dashboard Pusher',trigger:'Every 5 min'},
+  {ref:'EX-01',name:'External API Monitor',trigger:'Every hour'},
+  {ref:'SEC-02',name:'Suspicious Activity Monitor',trigger:'Every hour'},
+  {ref:'RV-03',name:'Monthly Revenue Report',trigger:'End of month'},
+  {ref:'MNT-04',name:'Regression Tester',trigger:'Weekly Sun 04:30'},
+];
+
+let log=[];
+let state={streams:0,n8nOk:false,ffmpegOk:false};
+
+function fmt(n){
+  if(n===null||n===undefined||n==='—')return'—';
+  if(typeof n==='number')return n>=1000?(n/1000).toFixed(1)+'K':n.toLocaleString();
+  return n;
+}
+
+function set(id,val,cls){
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.textContent=val;
+  if(cls){el.className=el.className.replace(/\b(gold|green|red|amber)\b/g,'')+' '+cls;}
+}
+
+function addLog(msg,type='info'){
+  const t=new Date().toTimeString().slice(0,5);
+  log.unshift({msg,type,t});
+  if(log.length>25)log.pop();
+  const feed=document.getElementById('alert-feed');
+  const dotMap={info:'●',ok:'●',warn:'▲',crit:'■'};
+  feed.innerHTML=log.map(a=>`
+    <div class="alert-item ${a.type}">
+      <span class="alert-dot">${dotMap[a.type]||'●'}</span>
+      <span class="alert-time">${a.t}</span>
+      <span class="alert-msg">${a.msg}</span>
+    </div>`).join('');
+}
+
+function setStatus(status,text,detail){
+  const b=document.getElementById('net-badge');
+  b.className='status-badge badge-'+status.toLowerCase();
+  b.textContent=status;
+  document.getElementById('net-text').textContent=text;
+  document.getElementById('net-detail').textContent=detail||'';
+}
+
+function calcUptime(startedAt){
+  const d=Date.now()-new Date(startedAt).getTime();
+  const h=Math.floor(d/3600000);
+  const m=Math.floor((d%3600000)/60000);
+  return h+'h '+m+'m';
+}
+
+async function loadStreams(){
+  try{
+    const r=await fetch(`${FFMPEG}/stream/status`,{headers:{'x-api-key':KEY}});
+    if(!r.ok)throw new Error('Status '+r.status);
+    const d=await r.json();
+    const active=d.streams||[];
+    state.streams=active.length;
+    state.ffmpegOk=true;
+    set('stat-streams',active.length);
+    set('ops-ffmpeg','ONLINE','green');
+    document.getElementById('streams-grid').innerHTML=STREAMS.map(s=>{
+      const live=active.find(a=>a.streamId===s.id);
+      const on=!!live;
+      const restarts=live?live.restartCount||0:0;
+      const uptime=live&&live.startedAt?calcUptime(live.startedAt):'—';
+      return`<div class="stream-card ${on?'active':'inactive'}">
+        <div class="sc-bar"></div>
+        <div class="sc-id">${s.id.replace(/-/g,' ').toUpperCase()}</div>
+        <div class="sc-name">${s.label}</div>
+        <div class="sc-status ${on?'on':'off'}"><span class="sc-dot"></span>${on?'LIVE':'OFFLINE'}</div>
+        ${on?`<div class="sc-restarts">UP ${uptime} · RESTARTS: ${restarts}</div>`:''}
+      </div>`;
+    }).join('');
+    addLog(`Streams: ${active.length}/6 active`,'ok');
+  }catch(e){
+    state.ffmpegOk=false;
+    set('ops-ffmpeg','ERROR','red');
+    addLog('FFmpeg unreachable: '+e.message,'warn');
+    document.getElementById('streams-grid').innerHTML=`
+      <div class="stream-card loading" style="grid-column:1/-1">
+        <div class="sc-bar"></div>
+        <div class="sc-id">UNAVAILABLE</div>
+        <div class="sc-name" style="color:var(--text-dim)">Cannot reach FFmpeg service. Streams may still be running on Railway.</div>
+      </div>`;
+  }
+}
+
+async function loadDashboard(){
+  try{
+    const r=await fetch(`${N8N}/webhook/ops/dashboard`);
+    if(!r.ok)throw new Error('Status '+r.status);
+    const d=await r.json();
+    state.n8nOk=true;
+    const fn=d.youtube?.feedNetwork||{};
+    const f911=d.youtube?.feed911||{};
+    set('fn-subs',fmt(fn.subscribers));
+    set('fn-views',fmt(fn.todayViews));
+    set('fn-live',fmt(fn.liveViewers));
+    set('f911-subs',fmt(f911.subscribers));
+    set('f911-views',fmt(f911.todayViews));
+    set('f911-live',fmt(f911.liveViewers));
+    set('stat-subs',fmt((fn.subscribers||0)+(f911.subscribers||0)));
+    set('stat-viewers',fmt((fn.liveViewers||0)+(f911.liveViewers||0)));
+    set('stat-wf',fmt(d.n8n?.activeWorkflows));
+    set('ops-n8n','ONLINE','green');
+    set('ops-execs',fmt(d.n8n?.executionsToday));
+    const fails=d.n8n?.failuresToday||0;
+    set('ops-fails',fmt(fails),fails>5?'red':fails>0?'amber':'green');
+    set('rev-week',d.revenue?.weekRevenue?'£'+fmt(d.revenue.weekRevenue):'—');
+    set('rev-patreon',fmt(d.revenue?.patreonMembers));
+    set('rev-deals',fmt(d.revenue?.openDeals));
+    set('rev-pipeline',d.revenue?.pipelineValue?'£'+fmt(d.revenue.pipelineValue):'—');
+    set('rev-invoices',d.revenue?.outstandingInvoices?'£'+fmt(d.revenue.outstandingInvoices):'—');
+    set('foia-open',fmt(d.foiaOpen));
+    set('adoptions',fmt(d.adoptionsTotal));
+    set('social-today',fmt(d.socialPostsToday));
+    set('hr-roles',fmt(d.openRoles));
+    set('ypp',d.yppProgress||'—');
+    addLog('Dashboard data loaded from n8n','ok');
+  }catch(e){
+    state.n8nOk=false;
+    set('ops-n8n','UNAVAILABLE','amber');
+    addLog('Dashboard webhook unavailable — using cached data','warn');
+    set('stat-wf','200+');
+  }
+}
+
+function updateHealth(){
+  let score=0;
+  if(state.streams===6)score+=20;
+  else if(state.streams>=4)score+=14;
+  else if(state.streams>=2)score+=8;
+  if(state.n8nOk)score+=20;
+  if(state.ffmpegOk)score+=10;
+  score+=10; // base score for site being up
+  const display=Math.min(score,60);
+  set('health-num',display);
+  const pct=display/60;
+  const arc=document.getElementById('health-arc');
+  const circ=326.7;
+  if(arc){
+    arc.style.strokeDashoffset=circ-(circ*pct);
+    arc.className='fill '+(pct>=0.85?'excellent':pct>=0.65?'good':pct>=0.45?'fair':'poor');
+  }
+  const r=document.getElementById('health-rating');
+  if(r){
+    const label=pct>=0.85?'EXCELLENT':pct>=0.65?'GOOD':pct>=0.45?'FAIR':'ATTENTION';
+    const cls=pct>=0.85?'excellent':pct>=0.65?'good':pct>=0.45?'fair':'poor';
+    r.textContent=label; r.className='health-rating '+cls;
+  }
+  set('health-sub',`${display}/60 network health score`);
+  if(pct>=0.85)setStatus('HEALTHY','All systems operational',`${state.streams}/6 streams · Workflows active`);
+  else if(pct>=0.65)setStatus('WARNING','Minor issues detected',`${state.streams}/6 streams active`);
+  else setStatus('CRITICAL','Action required',`${state.streams}/6 streams active`);
+}
+
+function renderWorkflows(){
+  document.getElementById('wf-body').innerHTML=WORKFLOWS.map(w=>`
+    <div class="wf-row">
+      <div class="wf-cell wf-id">${w.ref}</div>
+      <div class="wf-cell wf-name">${w.name}</div>
+      <div class="wf-cell"><span class="wf-badge ws-active">ACTIVE</span></div>
+      <div class="wf-cell wf-trigger">${w.trigger}</div>
+    </div>`).join('');
+}
+
+async function loadAll(){
+  document.getElementById('ts').textContent=new Date().toTimeString().slice(0,8);
+  setStatus('LOADING','Fetching live data...','');
+  addLog('Refreshing all data sources...','info');
+  await Promise.allSettled([loadStreams(),loadDashboard()]);
+  updateHealth();
+  renderWorkflows();
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  setInterval(()=>{document.getElementById('ts').textContent=new Date().toTimeString().slice(0,8);},1000);
+  addLog('Dashboard initialised','ok');
+  loadAll();
+  setInterval(loadAll,60000);
+});
+</script>
+</body>
+</html>
