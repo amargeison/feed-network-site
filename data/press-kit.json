@@ -1,0 +1,26 @@
+{
+  "lastUpdated": "2026-03-23",
+  "channels": {
+    "feed911": {
+      "name": "911FEED",
+      "handle": "@911feed",
+      "subscribers": 0,
+      "totalViews": 0,
+      "videoCount": 0,
+      "description": "True crime, FOIA releases, and police scanner live streams"
+    },
+    "feedNetwork": {
+      "name": "THE FEED NETWORK",
+      "handle": "@THE_FEED_NETWORK",
+      "subscribers": 0,
+      "totalViews": 0,
+      "videoCount": 0,
+      "description": "Hub channel for the Feed Network live streaming network"
+    }
+  },
+  "network": {
+    "totalSubscribers": 0,
+    "totalViews": 0,
+    "totalVideos": 0
+  }
+}
